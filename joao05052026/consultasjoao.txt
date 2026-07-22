@@ -1,0 +1,72 @@
+a. Mostrar o nome, endereço e telefone de cada paciente. 
+SELECT
+    nome_pac AS nome,
+    ender_pac AS endereco,
+    fone_pac AS telefone
+FROM Paciente;
+
+
+
+
+
+
+ 
+b. Mostrar o nome e telefones de cada médico.  
+
+SELECT
+    m.nome_med AS nome_medico,
+    f.fone AS telefone
+FROM Medico m
+JOIN FoneMedico f
+    ON m.CRM = f.Medico_CRM
+ORDER BY m.nome_med;
+
+
+
+
+c. Mostrar o nome, endereço e telefones de cada médico.
+
+SELECT
+    m.nome_med AS nome_medico,
+    m.ender_med AS endereco,
+    f.fone AS telefone
+FROM Medico m
+JOIN FoneMedico f
+    ON m.CRM = f.Medico_CRM
+ORDER BY m.nome_med;
+
+
+
+
+  
+d. Mostrar o nome de cada paciente, a data e hora de suas consultas.  
+SELECT
+    p.nome_pac AS nome_paciente,
+    c.data,
+    c.hora
+FROM Paciente p
+JOIN Consulta c
+    ON p.cod_pac = c.Paciente_cod_pac
+ORDER BY p.nome_pac, c.data, c.hora;
+
+
+
+
+
+
+
+e. Mostrar o nome dos médicos e suas especialidades. 
+
+SELECT
+    m.nome_med AS nome_medico,
+    e.especialidade
+FROM Medico m
+JOIN EspMedico em
+    ON m.CRM = em.Medico_CRM
+JOIN Especialidade e
+    ON em.Especialidade_codesp = e.codesp
+ORDER BY m.nome_med;
+
+
+
+

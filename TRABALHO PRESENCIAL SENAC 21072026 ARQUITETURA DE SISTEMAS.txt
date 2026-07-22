@@ -1,0 +1,193 @@
+TRABALHO PRESENCIAL SENAC 21/07/2026 -> ARQUITETURA DE SISTEMAS
+
+LINK DE APRESENTAÇÃO GRÁFICA: https://canva.link/304ejysfvry583n
+
+1. who is the cliente? app celular, smart tv, navegador desktop
+2. who is the server? o que ele está processadno?
+3. existe banco de dados? o que está sendo armazenado lá?
+4. existe api? onde ela fica no diagrama?
+5. como ocorre a comunicação? dê exemplos de onde ocorreria um get e um post
+
+------------------------------------
+spotify
+1:Mobile Apps (iOS & Android) | web navigator | desktop app | smart tv
+2: o servidor é o conjunto do backend (dividido em 2 partes): 
+Edge & Delivery : Recebe as requisições do cliente
+Autentica/autoriza (ex.: token)
+Roteia a chamada para o serviço correto
+Aplica rate limit, cache e padronização de resposta
+
+
+Microservices: Processa a lógica de negócio.
+Exemplo:
+Search service: encontra músicas/álbuns/artistas
+User service: perfil, preferências, histórico
+Playlists service: criar/editar playlists, músicas dentro
+Recommendations service: gera/atualiza sugestões
+Playback/Player services (às vezes separados): orquestra estado de reprodução e sincronia do player (dependendo da versão/implementação)
+Payments/Subscription service (se premium): cobrança, status do plano
+Notifications service (se existir): avisos e e-mails/push
+
+
+
+3:Dados do usuário (login, perfil, preferências, assinaturas)
+Biblioteca (o que você salvou)
+Playlists (nome, descrição, músicas, ordem)
+Metadados de catálogo (artistas, álbuns, faixas, gêneros etc.)
+Estado de recomendação (features, embeddings, modelos/atualizações, ou “resultados” cacheados)
+Eventos e histórico (escutas, cliques, curtidas — às vezes em forma agregada ou em “event streams” antes de virar consulta)
+Contas e pagamento (status do plano, histórico de transações — normalmente com cuidado extra)
+Credenciais/tokens (muitas vezes não “em banco tradicional” como texto simples; mas algo persistente para autenticação e sessões)
+
+
+4:API Gateway fica após o client layer, na parte de Edge & Delivery, para o client se comunicar com o backend
+
+5: 
+Comunicação: cliente faz chamada para API Gateway (chamada HTTP)->API Gateway faz chamada para microservices (via HTTP/gRPC/mensagem)-> microservices lê ou escreve os dados no banco de dados -> é enviado uma resposta JSON com os resultados, status, tokens, listas
+
+exemplo de GET: quando quer buscar algo-> get /v1/search?q=love&type=track   isso vai retornar faixas ou álbuns que atendam à requisição
+
+exemplo de POST: quando você cria uma playlist-> POST /v1/playlists
+------------------------------------
+
+NETFLIX
+
+
+1: mobile app, smart tv, navegador desktop
+2: é o conjunto de componentes do backend da Netflix -> API Gateway, microservices, intermediate services
+API -> receber as requisições do cliente 
+Microservices-> regras de negócio e dados de cada domínio
+Intermediate services -> descoberta ou registro de serviços, cache, objetos, observabilidade
+3: Existem 2 bancos (MySQL e Cassandra)
+MySQL-> armazena os dados estruturados ou relacionais -> usuário, cadastro, metadados -> tabelas
+Cassandra -> dados distribuídos e em alta escala (escrita ou consulta em grande escala) -> logs ou telemetria, dados de usuários em escala, eventos
+
+MySQL (relacional) Cassandra (NoSQL)
+
+4: Fica na entrada do backend (API Gateway), vai ser onde as requisições do cliente vão entrar e serão enviadas para os microservices
+5: cliente envia requisição HTTP no gateway, o gateway encaminha para o microservice correspondente e após isso temos o retorno de volta para o cliente
+
+exemplo de GET: GET /catalogo?genero=acao
+Cliente (app/TV/browser) pede a lista/catalogo.
+
+
+exemplo de POST: POST /login (ou /session)
+Cliente envia credenciais/tokens (conforme o desenho do sistema).
+
+------------------------------------
+
+UBER 
+1: mobile app (motorista e passageiro), web desktop
+2: o servidor backend inclui API, core services, matching service, pricing service, payment service, notification service
+api: recebe requisição do cliente
+core service: coordena chamadas entre serviços e trata regras principais
+matching service: pega a localização ou necessidade do passageiro e encontra motoristas compatíveis
+pricing service: processa o cálculo de preço-> tarifa base+distância ou tempo + cupom ou promo+ surge (se houver)
+payment service: integração com o provedor [cartão ou carteira], processa pagamentos, confirmação de transação
+notification service: processa a notificação, avisa passageiro ou motorista [se aceitou, cancelou chegou]
+
+3: Tem 2 base (Cassandra e MySQL)
+MySQL-> usuário, perfil, conta, dados de pagamento, rota de corrida agregada (estruturas relacionais)
+Cassandra -> Dados históricos e orientados a eventos -> logs, eventos de corrida, trilhas, estados ao longo do tempo
+tem o cache que é para armazenamento temporário
+
+4: API Gateway, fica logo na entrada do backend, após ela a requisição irá para os microservices
+
+5: Requisição HTTP do cliente -> API -> microservices -> retorno JSON
+
+Exemplo de GET: Cliente (passageiro) solicita uma cotação/preço estimado:
+GET /pricing/estimate?pickup=...&dropoff=...
+
+Exemplo de POST: Cliente cria um pedido de corrida:
+POST /rides
+------------------------------------
+
+Whatsapp
+
+1: mobile app, webclient, desktop
+2: server é load balancer e chat server
+Load Balancer (HAProxy): recebe conexões e distribui para um “Chat Server”.
+Chat Servers (1..N): são o núcleo que processa mensagens e estado de sessão-> gerencia as rotas de remetente e destinatário, valida entrega, mantém e processa conexões
+
+3: 3 tipos de banco (User DB, Message DB, Cache (redis)
+User DB (postgres)-> dados de usuário ou relacionamentos (perfil, credenciais, identidade, chaves, configurações)
+Message DB (Cassandra)-> persistência de mensagens, metadata, histórico, ordenação, status de entrega ou consulta
+Cache: dados temporários (presença, se está online)
+
+4: fica no load balancer (HAProxy), ele seria uma forma de API, pois encaminha para o chat server
+
+5: cliente faz requisição ou conexão para o backend, chat server recebe eventos, processa, grava ou consulta banco de dados e encaminha para destinatários ou entrega para o cliente
+
+exemplos de get: “Buscar informações de usuário/perfil”:
+Cliente mobile: GET “/users/me” (consulta User DB).
+
+exemplos de post: Enviar uma mensagem:
+Cliente mobile: POST “/messages/send” com payload (destinatário, texto, IDs, timestamps).
+------------------------------------
+
+INSTAGRAM
+
+1: mobile app, desktop navigator
+2: API Gateway, microservices, message services & async processing
+api: recebe requisição HTTP e encaminha para o microservice correto
+microservice: autenticação, perfil, upload, feed de notificação, feed
+message service & async processing: kafka-> processa eventos do tipo post criado, comentário feito, likes ||| -> workers: fazem tarefas pesaas ou demoradas fora da requisição do usuário
+
+3: Postgre SQL: dados estruturados e relacionais-> usuários, perfis, relações, metadados, comentários, curtidas
+redis cache->  guarda os dados temporários (feed recente, contados, resultados)
+
+4: API Gateway, fica depois do CDN EDGE NODES
+
+5: cliente requisita algo, CDN EDGE NODES envia para API e api manda para microservices, após isso vai para DB e vem a resposta
+
+Exemplos de get: Obter feed:
+Cliente faz `GET /feed?userId=...
+
+exemplos de post: Fazer login:
+POST /auth/login (ou /session)
+
+------------------------------------
+
+IFOOD
+
+1: mobile app, desktop navigator
+2: Kong API Gateway / Kong + gateway
+Kubernetes (EKS) onde rodam os microservices
+Microservices (ex.: “MicroService – Provision”, “MicroService – Master Data Management”, “MicroService – Requisition” etc.)
+
+provision: preparação ou entrega de dados ou serviços para operações do domínio
+master data management: consulta ou atualização de dados mestres (cadastro de informações de referência)
+requisition: tratamento de requisições 
+
+3: database master data -> dados mestres (cadastro e informações de referência) usados pelo microservices
+
+4: KONG API Gateway
+ante do BFF, a requisição do cliente chega no KONG e após isso vai para o kubernetes no BFF e depois para o microservice correto
+
+5: 
+requisição do cliente vem para o angular, do angular para o kong, do kong para o kubernetes , onde irá para os microservices, e após isso pode ir para o banco e integrações, depois disso volta uma resposta ao cliente
+
+exemplos de get: GET /v1/marketplaces/{id}/details
+O cliente (app) pede detalhes.
+
+exemplos de post:POST /v1/orders/{orderId}/cancel
+Envia comando de cancelamento.
+
+
+
+------------------------------
+
+DEVOPS -> AUTOMAÇÃO
+PESQUISE:
+- O QUE PODE SER AUTOMATIZADO -> TESTES E GATES: TESTES UNITÁRIOS, INTEGRAÇÃO, TESTES DE SEGURANÇA || VERSIONAMENTO E RELEASE: CRIAÇÃO AUTOMÁTICA DE TAGS, CHANGELOG, VERSION BUMP || CI (CONTINUOUS INTEGRATION): BUILD E TESTES A CADA COMMIT, CHECAGENS DE QUALIDADE, GERAÇÃO DE ARTEFATOS
+- BENEFÍCIOS DA AUTOMAÇÃO -> MENOS ERRO HUMANO (ETAPAS REPETITIVAS FICAM PADRONIZADAS E RASTREÁVEIS), ENTREGA MAIS FREQUENTE (PIPELINES AUTOMÁTICOS DIMINUEM GARGALOS E ACELERAM RELEASE, ESCALA DO TIME (DEV FOCA EM CÓDIGO, OPS GARANTE PREVISIBILIDADE VIA AUTOMAÇÃO
+- EXEMPLOS DE FERRAMENTAS
+
+FERRAMENTAS:
+JENKINS -> SERVIDOR DE AUTOMAÇÃO/CI;CD OPEN SOURCE COM ECOSSISTEMA DE PLUGINS -> NORMALMENTE UTILIZADO EM SETUPS MAIS CUSTOMIZADOS, AMBIENTES HÍBRIDOS E CENÁRIOS COM MUITAS INTEGRAÇÕES DIFERENTES || AUTOMATIZA PIPELINES DE BUILD, TEST, DEPLOY
+GITHUB ACTIONS -> AUTOMAÇÃO DENTRO DO ECOSSISTEMA GITHUB, USANDO WORKFLOW EM YAML NO REPOSITÓRIO || GRANDE UTILIDADE EM TIMES QUE JÁ UTILIZAM GITHUB COMO FONTE DE CÓDIGO E QUEREM AUTOMAÇÃO ORIENTADA A EVENTOS || AUTOMATIZA BUILD, TEST, DEPLOY, APROVAÇÕES EM PONTOS DO PIPELINE, INTEGRAÇÕES COM SERVIÇOS EXTERNOS VIA AÇÕES
+GITLAB CI -> CI/CD INTEGRADO AO GITLAB com pipeline definido por .gitlab-ci.yml || UTILIZADO EM TIMES QUE JÁ UTILIZAM GITLAB APRA CODE REVIEW, MRs E PROCESSOS DE DEVOPS (PADRONIZAÇÃO DE UMA PLATAFORMA) || AUTOMATIZA STAGES DE CI E CD, EXECUÇÃO COM RUNNERS, TESTES E DEPLOYS COM RASTREABILIDADE NO PRÓPRIO FLUXO DO PROJETO
+
+
+
+

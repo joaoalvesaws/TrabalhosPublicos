@@ -1,0 +1,37 @@
+Testes de caixa preta:
+- Cadastro de dono com dados válidos
+--Nome: Maria Silva, CPF: 12345678900
+-- Resultado esperado: dono adicionado à lista.
+--Resultado foi o esperado -> passou
+
+-Cadastro de dono sem informar o nome
+-- Nome: , cpf: 12345678900
+--Resultado esperado: mensagem de erro
+-- Resultado foi o esperado -> passou
+
+- Cadastro de dono com cpf inválido (letras)
+--nome: ana, cpf abcde
+--Resultado esperado: sistema deve rejeitar cpf inválido
+-- Resultado não foi o esperado, aceitou sem validação do formato -> falhou
+
+-cadastro de dono com nome apenas com espaços
+--nome: '  ', cpf 12345678900
+--Resultado esperado: campo deve ser considerado vazio, gerando alerta
+-- Resultado foi o esperado -> passou
+
+
+Testes de caixa branca:
+- Construtor de Dono inicializa corretamente
+--entrada: new Dono("111.222.333-44", "Pedro")
+-- Resultado esperado: getCpf()="111.222.333-44", getNome()="Pedro"
+--Resultado foi o esperado -> passou
+
+- Dono aceita CPF nulo sem lançar exceção
+--entrada: new Dono(null, "Jose")
+-- Resultado esperado: Dono criado; getCpf() retorna null
+-- Resultado não foi o esperado, não validou nulidade do cpf -> falhou
+
+-Setter setNome altera o atributo nome
+--entrada: dono.setNome("Carlos")
+--resultado esperado: getNome() retorna "Carlos"
+-- resultado foi o esperado -> passou

@@ -1,0 +1,296 @@
+
+1- O que é uma transação no PostgreSQL?
+É um conjunto de operações que são executadas como uma única unidade lógica de trabalho, ou seja, todas as operações devem ser concluídas com sucesso (commit), ou nenhuma delas é aplicada (rollback)
+
+exemplo:
+
+BEGIN;
+
+UPDATE contas SET saldo = saldo - 100 WHERE id = 1;
+UPDATE contas SET saldo = saldo + 100 WHERE id = 2;
+
+COMMIT;
+
+
+se der erro:
+
+ROLLBACK;
+
+
+---
+
+2- Explique o conceito ACID  
+É um conjunto de propriedades que garantem a segurança das transações:
+
+Atomicidade: Significa que a transação é indivisível ou todas as operações acontecem com sucesso, ou nenhuma acontece. (pra evitar que o banco fique "pela metade"
+Consistência: dados permanecem corretos, garante que o banco sempre sai de um estado válido para outro estado válido
+Isolamento: transações não interferem na outra enquanto está sendo executada
+Durabilidade: dados salvos não se perdem após o COMMIT
+
+exemplo:
+
+BEGIN;
+
+INSERT INTO produtos VALUES (1, 'Notebook', 3000);
+
+COMMIT;
+
+
+---
+3- Função dos comandos  
+
+BEGIN: inicia a transação  
+COMMIT: salva as alterações  
+ROLLBACK: desfaz as alterações caso apresentem algum erro
+
+exemplo:
+
+BEGIN;
+
+DELETE FROM produtos WHERE id = 1;
+
+ROLLBACK;
+
+
+---
+
+4- O que são bloqueios (locks)?  
+São mecanismos que controlam o acesso simultâneo aos dados.
+
+exemplo:
+
+BEGIN;
+
+UPDATE produtos SET nome = 'Mouse Gamer' WHERE id = 1;
+
+
+---
+
+5- Diferença entre locks  
+
+Shared Lock: permite leitura simultânea  
+Exclusive Lock: permite escrita exclusiva  
+
+exemplo:
+
+SELECT * FROM produtos;
+
+UPDATE produtos SET preco = 80 WHERE id = 1;
+
+
+---
+
+6- O que é deadlock?  
+É quando duas transações ficam esperando uma à outra e nenhuma continua.
+
+exemplo:
+
+-- Transação 1
+BEGIN;
+UPDATE conta SET saldo = saldo - 50 WHERE id = 1;
+
+-- Transação 2
+BEGIN;
+UPDATE conta SET saldo = saldo - 50 WHERE id = 2;
+
+-- T1 tenta acessar id=2
+UPDATE conta SET saldo = saldo - 10 WHERE id = 2;
+
+-- T2 tenta acessar id=1
+UPDATE conta SET saldo = saldo - 10 WHERE id = 1;
+
+---
+
+7- Como o PostgreSQL controla concorrência?  
+Usa MVCC (multiversão), permitindo várias versões dos dados.
+
+exemplo:
+
+SELECT * FROM produtos;
+
+
+---
+
+
+
+1- O que é backup?  
+É uma cópia dos dados que existem.
+ex: g_dump -U postgres -d loja > backup.sql
+---
+
+2- Importância do backup  
+Evita perda de dados e dores de cabeça.
+ex: psql -U postgres -d loja < backup.sql
+---
+
+3- Diferença  
+
+Backup lógico: arquivos SQL  
+Backup físico: arquivos do banco  
+ex: pg_dump banco > backup.sql
+---
+
+4- Comandos  
+
+- pg_dump: faz backup  
+- pg_restore: restaura backup  
+
+exemplo:
+
+pg_restore -U postgres -d loja backup.sql
+
+---
+
+5- Completo x incremental  
+
+Completo: copia todos os dados do banco
+Incremental: copia somente o que mudou desde o último backup
+
+exemplo:
+
+pg_dump banco > completo.sql
+
+
+---
+
+6- O que é restore?  
+É a recuperação dos dados.
+
+exemplo:
+
+psql -U postgres -d loja < backup.sql
+
+
+---
+
+7- Cuidados  
+Verificar backup, testar antes, evitar sobrescrever dados.
+
+---
+
+Parte 3 — JOINs
+
+INNER JOIN  
+Retorna apenas registros relacionados.
+
+exemplo:
+
+SELECT c.nome, p.id
+FROM clientes c
+INNER JOIN pedidos p ON c.id = p.cliente_id;
+
+
+---
+
+LEFT JOIN  
+Retorna todos da tabela da esquerda.
+
+exemplo:
+
+SELECT c.nome, p.id
+FROM clientes c
+LEFT JOIN pedidos p ON c.id = p.cliente_id;
+
+
+---
+
+RIGHT JOIN  
+Retorna todos da direita.
+
+exemplo:
+
+SELECT c.nome, p.id
+FROM clientes c
+RIGHT JOIN pedidos p ON c.id = p.cliente_id;
+
+
+---
+
+FULL OUTER JOIN  
+Retorna tudo das duas tabelas.
+
+exemplo:
+
+SELECT c.nome, p.id
+FROM clientes c
+FULL OUTER JOIN pedidos p ON c.id = p.cliente_id;
+
+
+---
+UNION  
+Junta resultados de consultas.
+
+exemplo:
+
+SELECT nome FROM clientes
+UNION
+SELECT nome FROM fornecedores;
+
+
+---
+
+Parte 4 — Permissões
+
+1- O que são permissões?  
+São regras de acesso aos dados.
+
+---
+
+2- GRANT  
+Concede permissões a um usuário ou role.
+
+exemplo:
+
+GRANT SELECT, INSERT ON produtos TO usuario1;
+
+
+---
+
+3- REVOKE  
+Remove permissões de usuário ou role.
+
+exemplo:
+
+REVOKE INSERT ON produtos FROM usuario1;
+
+
+---
+
+4- Tipos de permissões  
+
+SELECT: consultar dados da tabela
+INSERT: inserir novos registros
+UPDATE: atualizar dados existentes
+DELETE: excluir apagar registros
+ALL PRIVILEGES: concede todas as permissões
+
+exemplo:
+
+GRANT ALL PRIVILEGES ON produtos TO usuario1;
+
+
+---
+
+5- O que são roles?  
+Roles são entidades usadas para controlar permissões no PostgreSQL. (usadas por vários usuários)
+
+exemplo:
+
+CREATE ROLE admin;
+
+
+---
+
+6- Diferença entre usuário e role  
+Usuário é uma role com permissão de login, já a role pode ou não ter login (+ genérico)
+todo usuário é uma role, mas nem toda role é um usuário
+
+exemplo:
+
+CREATE USER joao WITH PASSWORD '123';
+
+
+---
+
+7- Importância  
+Protege os dados e controla acessos, evitar erros e garantir segurança ao banco.
