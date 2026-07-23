@@ -1,0 +1,13 @@
+1:
+Conceito: metodologia de desenvolvimento que acelera a entrega de aplicações e serviços ao combinar o trabalho das equipes de desenvolvimento (dev) e operações de TI (Ops)
+Objetivo principal: automatizar processos e incentivar a colaboração entre as equipes, não trabalhando de forma isolada mas em conjunto
+Beneficios para empresas e equipes: respostas rápidas às demandas do mercado, reduzindo o tempo de lançamento de novos recursos. Melhora da qualidade e velocidade através de loops de feedback. Mais eficiência, colaboração aprimorada.
+
+
+2: cultura e colaboração: quebra dos silos entre o time dev e o time de operações e áreas que estão relacionadas. Tem trabalho orientado a objetivos comuns, a comunicação é constante além de responsabilidade compartilhada
+Automação: É uma forma de reduzir o trabalho manual além de reduzir a possibilidade de falhas humanas
+Integração contínua (CI): Quando houver commits/pull requests, ela irá ser integrada e validada por build + testes (vai auxiliar a detectar problemas cedo e manter o código saudável)
+Entrega contínua (CD): O sistema fica sempre pronto para ir para produção (o deploy pode ser aprovado manualente, mas o pipeline irá garantir que a versão esteja preparada para uso)
+Monitoração: Irá acompanhar o sistema em tempo real e também após mudanças (métricas, logs, alertas), essa é uma forma de observar falhas, desempenho e comportamento de produção
+Infraestrutura como código (IaC): infraestrutura definida e versionada por código (terraform, cloudformation), isso irá facilitar a consistência entre ambientes, auditoria.
+Segurança (DevSecOps): é a segurança integrada ao ciclo de desenvolvimento e entrega, não apenas depois (SAST/DAST, análise de dependências, gestão de segredos e políticas de acesso)
