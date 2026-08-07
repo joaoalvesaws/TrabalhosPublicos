@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escala 12 — Gestão de Plantões</title>
+<style>
+:root{
+  --ink:#151a21;
+  --paper:#eef0ec;
+  --panel:#1c232d;
+  --panel-2:#232c38;
+  --line:#2e3947;
+  --red:#b7312c;
+  --red-soft:#e2c4c2;
+  --amber:#d99a2b;
+  --slate:#6b7787;
+  --green:#3f7a52;
+  --text:#e7e9e6;
+  --text-dim:#9aa4b0;
+  --font-display: 'Bahnschrift', 'Arial Narrow', Impact, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--font-body);}
+::selection{background:var(--red);color:#fff;}
+
+/* ---- shell ---- */
+#app{display:flex;min-height:100vh;}
+.sidebar{
+  width:230px;flex:0 0 230px;background:var(--panel);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:20px 0;
+}
+.brand{padding:0 20px 20px;border-bottom:1px solid var(--line);margin-bottom:14px;}
+.brand .badge{
+  width:44px;height:44px;border-radius:6px;background:linear-gradient(155deg,var(--red),#7d1f1c);
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-display);
+  font-weight:800;font-size:20px;color:#fff;letter-spacing:0.5px;margin-bottom:10px;
+  box-shadow:0 2px 10px rgba(183,49,44,.35);
+}
+.brand h1{font-family:var(--font-display);font-size:19px;margin:0;letter-spacing:0.5px;font-weight:700;}
+.brand p{margin:2px 0 0;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;}
+
+.nav{display:flex;flex-direction:column;gap:2px;padding:10px 10px;flex:1;}
+.nav button{
+  all:unset;cursor:pointer;padding:10px 12px;border-radius:6px;font-size:13.5px;color:var(--text-dim);
+  display:flex;align-items:center;gap:10px;transition:background .12s, color .12s;
+}
+.nav button .n{font-family:var(--font-mono);font-size:10.5px;color:var(--slate);width:16px;}
+.nav button:hover{background:var(--panel-2);color:var(--text);}
+.nav button.active{background:var(--red);color:#fff;}
+.nav button.active .n{color:rgba(255,255,255,.7);}
+
+.userbox{margin:10px;padding:12px;border-top:1px solid var(--line);padding-top:14px;}
+.userbox label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);display:block;margin-bottom:6px;}
+.userbox select{width:100%;background:var(--panel-2);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px;font-size:13px;}
+
+.main{flex:1;min-width:0;background:var(--paper);color:var(--ink);}
+.topbar{
+  height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;
+  border-bottom:1px solid #d9dcd4;background:#fff;
+}
+.topbar h2{font-family:var(--font-display);font-size:20px;margin:0;font-weight:700;}
+.topbar .sub{font-size:12px;color:#7a8290;}
+.content{padding:28px;max-width:1280px;}
+
+/* ---- generic components ---- */
+.grid{display:grid;gap:16px;}
+.g4{grid-template-columns:repeat(4,1fr);}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:1000px){.g4{grid-template-columns:repeat(2,1fr);}.g3{grid-template-columns:repeat(1,1fr);}}
+
+.card{background:#fff;border:1px solid #e1e4dc;border-radius:10px;padding:18px;}
+.card h3{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#8a8f84;font-weight:700;}
+.stat{font-family:var(--font-display);font-size:32px;font-weight:800;margin-top:4px;}
+.stat.small{font-size:20px;}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.pill.black{background:#222;color:#fff;}
+.pill.red{background:var(--red);color:#fff;}
+.pill.gray{background:#b9bdb2;color:#fff;}
+.pill.blue{background:#3568b0;color:#fff;}
+.pill.green{background:var(--green);color:#fff;}
+.pill.amber{background:var(--amber);color:#fff;}
+
+button.btn{
+  all:unset;cursor:pointer;background:var(--red);color:#fff;padding:9px 16px;border-radius:6px;
+  font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center;
+}
+button.btn:hover{background:#9c2925;}
+button.btn.ghost{background:transparent;color:var(--red);border:1px solid var(--red);}
+button.btn.ghost:hover{background:#fbeceb;}
+button.btn.dark{background:var(--ink);color:#fff;}
+button.btn.dark:hover{background:#000;}
+button.btn.sm{padding:6px 10px;font-size:12px;}
+button.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+input,select,textarea{
+  font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid #d3d6cd;border-radius:6px;background:#fff;color:var(--ink);
+}
+label.f{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#8a8f84;margin:0 0 4px;font-weight:700;}
+.field{margin-bottom:12px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#8a8f84;padding:8px 10px;border-bottom:2px solid #e1e4dc;}
+td{padding:9px 10px;border-bottom:1px solid #eef0ec;}
+tr:hover td{background:#fafbf8;}
+
+.toast-wrap{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:999;}
+.toast{background:var(--ink);color:#fff;padding:12px 16px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.3);border-left:4px solid var(--amber);max-width:320px;}
+
+.modal-bg{position:fixed;inset:0;background:rgba(10,12,15,.55);display:flex;align-items:center;justify-content:center;z-index:998;}
+.modal{background:#fff;border-radius:12px;padding:24px;width:420px;max-width:92vw;max-height:86vh;overflow:auto;}
+.modal h3{margin-top:0;font-family:var(--font-display);}
+
+/* ---- calendar ---- */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-head h3{font-family:var(--font-display);font-size:22px;margin:0;text-transform:capitalize;}
+.cal-nav{display:flex;gap:6px;align-items:center;}
+.legend{display:flex;gap:14px;font-size:12px;margin:0 0 14px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-dow{font-size:11px;text-transform:uppercase;color:#8a8f84;text-align:center;padding-bottom:4px;font-weight:700;}
+.cal-cell{
+  background:#fff;border:1px solid #e1e4dc;border-radius:8px;min-height:78px;padding:6px 7px;position:relative;cursor:pointer;
+  transition:box-shadow .1s;
+}
+.cal-cell:hover{box-shadow:0 0 0 2px var(--red) inset;}
+.cal-cell.empty{background:transparent;border:none;cursor:default;}
+.cal-cell.empty:hover{box-shadow:none;}
+.cal-date{font-size:12px;font-weight:700;color:#555;}
+.cal-holi{font-size:9.5px;color:var(--amber);font-weight:700;display:block;line-height:1.2;margin-top:1px;}
+.cal-name{margin-top:22px;font-size:11.5px;font-weight:700;line-height:1.25;}
+.cal-cell.bar-black{border-top:4px solid #222;}
+.cal-cell.bar-red{border-top:4px solid var(--red);}
+.cal-cell.vac{background:repeating-linear-gradient(135deg,#f2f2ee,#f2f2ee 6px,#e7e8e2 6px,#e7e8e2 12px);}
+.cal-cell.blocked-flag::after{content:'●';color:#3568b0;position:absolute;top:6px;right:8px;font-size:9px;}
+
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.chip{background:#f1f2ec;border:1px solid #dfe1d8;border-radius:20px;padding:3px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;}
+.chip button{all:unset;cursor:pointer;color:#a33;font-weight:800;}
+
+.empty-state{padding:40px 20px;text-align:center;color:#8a8f84;}
+.badge-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.notif{padding:10px 12px;border-radius:8px;background:#f7f8f4;border:1px solid #e6e8e0;font-size:13px;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;align-items:center;}
+.notif small{color:#8a8f84;display:block;margin-top:2px;}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* =========================================================
+   ESCALA 12 — sistema de gestão de plantões de bombeiros
+   Aplicação single-file, dados persistidos em localStorage.
+   ========================================================= */
+
+const DOW = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const DOW_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+const store = {
+  get(k, fallback){ try{ const v = localStorage.getItem('esc12_'+k); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } },
+  set(k, v){ localStorage.setItem('esc12_'+k, JSON.stringify(v)); }
+};
+
+/* ---------- seed data ---------- */
+function seedFirefighters(){
+  const names = [
+    "Ana Ferreira","Bruno Castro","Carla Menezes","Diego Ramos","Elaine Souza","Fábio Nogueira",
+    "Gustavo Lima","Helena Prado","Igor Batista","Juliana Torres","Kleber Rocha","Larissa Vieira"
+  ];
+  return names.map((n,i)=>({
+    id: 'ff'+(i+1),
+    username: n.split(' ')[0].toLowerCase()+ (i+1),
+    name: n,
+    status: 'ativo', // ativo | ferias | afastado
+    vacations: [], // [{start,end}]
+    unavailable: [], // ['2026-03-04', ...]
+  }));
+}
+
+function seedHolidays(year){
+  // feriados nacionais fixos (aproximação; não inclui móveis como Páscoa/Carnaval calculados)
+  return [
+    {date:`${year}-01-01`, name:'Confraternização Universal', level:'nacional'},
+    {date:`${year}-04-21`, name:'Tiradentes', level:'nacional'},
+    {date:`${year}-05-01`, name:'Dia do Trabalho', level:'nacional'},
+    {date:`${year}-09-07`, name:'Independência', level:'nacional'},
+    {date:`${year}-10-12`, name:'Nossa Sra. Aparecida', level:'nacional'},
+    {date:`${year}-11-02`, name:'Finados', level:'nacional'},
+    {date:`${year}-11-15`, name:'Proclamação da República', level:'nacional'},
+    {date:`${year}-12-25`, name:'Natal', level:'nacional'},
+  ];
+}
+
+let DB = {
+  year: store.get('year', new Date().getFullYear()),
+  firefighters: store.get('firefighters', null) || seedFirefighters(),
+  holidays: store.get('holidays', null),
+  schedule: store.get('schedule', {}),        // { 'YYYY-MM-DD': firefighterId }
+  swaps: store.get('swaps', []),              // {id, fromId, date, toId, toDate, status, needsAdmin}
+  notifications: store.get('notifications', []),
+  scheduleStatus: store.get('scheduleStatus', 'draft'), // draft | sent | accepted
+  reviews: store.get('reviews', []),          // {id,ffId,comment,status}
+  currentUserId: store.get('currentUserId', 'admin'),
+  auditLog: store.get('auditLog', []),
+};
+if(!DB.holidays){ DB.holidays = seedHolidays(DB.year); }
+persistAll();
+
+function persistAll(){
+  store.set('year', DB.year);
+  store.set('firefighters', DB.firefighters);
+  store.set('holidays', DB.holidays);
+  store.set('schedule', DB.schedule);
+  store.set('swaps', DB.swaps);
+  store.set('notifications', DB.notifications);
+  store.set('scheduleStatus', DB.scheduleStatus);
+  store.set('reviews', DB.reviews);
+  store.set('currentUserId', DB.currentUserId);
+  store.set('auditLog', DB.auditLog);
+}
+function save(){ persistAll(); }
+function log(action){ DB.auditLog.unshift({t:new Date().toISOString(), action}); DB.auditLog=DB.auditLog.slice(0,300); save(); }
+function notify(text, target){ DB.notifications.unshift({id:'n'+Date.now()+Math.random().toString(16).slice(2), text, target:target||'admin', read:false, t:new Date().toISOString()}); save(); }
+function toast(msg){
+  const wrap = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(), 4200);
+}
+
+/* ---------- date helpers ---------- */
+function pad(n){return n<10?'0'+n:''+n;}
+function iso(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function fromIso(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function isHoliday(dateStr){ return DB.holidays.find(h=>h.date===dateStr); }
+function isWeekend(d){ const w=d.getDay(); return w===0||w===6; }
+function scaleType(dateStr){
+  const d = fromIso(dateStr);
+  return (isWeekend(d) || isHoliday(dateStr)) ? 'vermelha' : 'preta';
+}
+function daysInYear(year){
+  const out=[]; let d=new Date(year,0,1);
+  while(d.getFullYear()===year){ out.push(iso(d)); d.setDate(d.getDate()+1); }
+  return out;
+}
+function daysInMonth(year,month){
+  const out=[]; let d=new Date(year,month,1);
+  while(d.getMonth()===month){ out.push(iso(d)); d.setDate(d.getDate()+1); }
+  return out;
+}
+function addDays(dateStr,n){ const d=fromIso(dateStr); d.setDate(d.getDate()+n); return iso(d); }
+
+function ffById(id){ return DB.firefighters.find(f=>f.id===id); }
+function isOnVacation(ff, dateStr){
+  return (ff.vacations||[]).some(v=> dateStr>=v.start && dateStr<=v.end);
+}
+function isUnavailable(ff, dateStr){ return (ff.unavailable||[]).includes(dateStr); }
+function isEligible(ff, dateStr){
+  if(ff.status==='afastado') return false;
+  if(ff.status==='ferias') return false;
+  if(isOnVacation(ff, dateStr)) return false;
+  if(isUnavailable(ff, dateStr)) return false;
+  return true;
+}
+function hasRestConflict(ffId, dateStr, schedule){
+  // needs >=24h gap: cannot work day-1 or day+1
+  const prev = addDays(dateStr,-1), next = addDays(dateStr,1);
+  return schedule[prev]===ffId || schedule[next]===ffId;
+}
+
+/* ---------- auto scheduling algorithm ---------- */
+function generateSchedule(year){
+  const days = daysInYear(year);
+  const schedule = {};
+  const counts = {}; const blackCounts={}; const redCounts={};
+  DB.firefighters.forEach(f=>{counts[f.id]=0; blackCounts[f.id]=0; redCounts[f.id]=0;});
+
+  const unresolved = [];
+
+  for(const day of days){
+    const type = scaleType(day);
+    let candidates = DB.firefighters.filter(f=> isEligible(f, day) && !hasRestConflict(f.id, day, schedule));
+
+    if(candidates.length===0){
+      // relax: allow rest-conflict only as last resort (should be rare), keep eligibility
+      candidates = DB.firefighters.filter(f=> isEligible(f, day));
+    }
+    if(candidates.length===0){ unresolved.push(day); continue; }
+
+    // score: prioritize lowest total, then lowest count of this type, then lowest overall to balance rotation
+    candidates.sort((a,b)=>{
+      const typeCountA = type==='vermelha'? redCounts[a.id]:blackCounts[a.id];
+      const typeCountB = type==='vermelha'? redCounts[b.id]:blackCounts[b.id];
+      if(counts[a.id]!==counts[b.id]) return counts[a.id]-counts[b.id];
+      if(typeCountA!==typeCountB) return typeCountA-typeCountB;
+      return Math.random()-0.5;
+    });
+
+    const chosen = candidates[0];
+    schedule[day] = chosen.id;
+    counts[chosen.id]++;
+    if(type==='vermelha') redCounts[chosen.id]++; else blackCounts[chosen.id]++;
+  }
+
+  DB.schedule = schedule;
+  DB.scheduleStatus = 'draft';
+  save();
+  log(`Escala anual de ${year} gerada automaticamente (${unresolved.length} dias sem cobertura).`);
+  return {schedule, counts, blackCounts, redCounts, unresolved};
+}
+
+function computeMetrics(year){
+  const counts={}, blackCounts={}, redCounts={};
+  DB.firefighters.forEach(f=>{counts[f.id]=0; blackCounts[f.id]=0; redCounts[f.id]=0;});
+  const days = daysInYear(year);
+  let uncovered=0;
+  days.forEach(day=>{
+    const id = DB.schedule[day];
+    if(!id){ uncovered++; return; }
+    counts[id]=(counts[id]||0)+1;
+    if(scaleType(day)==='vermelha') redCounts[id]=(redCounts[id]||0)+1; else blackCounts[id]=(blackCounts[id]||0)+1;
+  });
+  const vals = Object.values(counts);
+  const max = Math.max(...vals), min = Math.min(...vals);
+  const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const variance = vals.reduce((a,b)=>a+Math.pow(b-mean,2),0)/vals.length;
+  const stdev = Math.sqrt(variance);
+  const fairness = Math.max(0, 100 - stdev*22).toFixed(1); // heuristic 0-100
+  return {counts, blackCounts, redCounts, uncovered, max, min, deviation:(max-min), fairness};
+}
+
+/* ============ UI STATE ============ */
+let UI = { view:'dashboard', calYear: DB.year, calMonth: new Date().getMonth(), selectedDay:null, editFF:null };
+
+function currentUser(){
+  if(DB.currentUserId==='admin') return {id:'admin', name:'Administrador', role:'admin'};
+  const f = ffById(DB.currentUserId);
+  return f ? {id:f.id, name:f.name, role:'bombeiro', ff:f} : {id:'admin', name:'Administrador', role:'admin'};
+}
+
+/* ============ RENDER ROOT ============ */
+function render(){
+  const u = currentUser();
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="sidebar">
+      <div class="brand">
+        <div class="badge">E12</div>
+        <h1>Escala 12</h1>
+        <p>Gestão de plantões</p>
+      </div>
+      <div class="nav">
+        ${navBtn('dashboard','01','Dashboard', u)}
+        ${navBtn('calendar','02','Calendário', u)}
+        ${u.role==='admin'? navBtn('firefighters','03','Bombeiros', u):''}
+        ${u.role==='admin'? navBtn('holidays','04','Feriados', u):''}
+        ${u.role==='admin'? navBtn('generate','05','Gerar escala', u):''}
+        ${navBtn('swaps','06','Trocas', u)}
+        ${u.role==='admin'? navBtn('approval','07','Aprovação', u):''}
+        ${u.role==='bombeiro'? navBtn('myrestrictions','06b','Minhas restrições', u):''}
+        ${navBtn('notifications','08','Notificações', u)}
+        ${u.role==='admin'? navBtn('audit','09','Auditoria', u):''}
+      </div>
+      <div class="userbox">
+        <label>Entrar como</label>
+        <select id="userSelect">
+          <option value="admin" ${u.id==='admin'?'selected':''}>Administrador</option>
+          ${DB.firefighters.map(f=>`<option value="${f.id}" ${u.id===f.id?'selected':''}>${f.name}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div><h2>${viewTitle(UI.view)}</h2><div class="sub">${u.role==='admin'?'Perfil administrador':'Perfil bombeiro · '+u.name}</div></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="pill ${DB.scheduleStatus==='accepted'?'green':DB.scheduleStatus==='sent'?'amber':'gray'}">${statusLabel(DB.scheduleStatus)}</span>
+        </div>
+      </div>
+      <div class="content" id="content"></div>
+    </div>
+  `;
+  document.getElementById('userSelect').onchange = e=>{ DB.currentUserId = e.target.value; save(); UI.view='dashboard'; render(); };
+  renderContent();
+}
+function statusLabel(s){ return s==='accepted'?'Escala aceita':s==='sent'?'Aguardando aprovação':'Rascunho'; }
+function navBtn(view,n,label,u){
+  return `<button class="${UI.view===view?'active':''}" onclick="setView('${view}')"><span class="n">${n}</span>${label}</button>`;
+}
+function setView(v){ UI.view=v; render(); }
+function viewTitle(v){
+  return {dashboard:'Dashboard', calendar:'Calendário anual/mensal', firefighters:'Bombeiros', holidays:'Feriados',
+    generate:'Geração automática de escala', swaps:'Trocas de plantão', approval:'Aprovação de escala',
+    myrestrictions:'Minhas restrições e férias', notifications:'Notificações', audit:'Auditoria'}[v] || '';
+}
+
+function renderContent(){
+  const c = document.getElementById('content');
+  const u = currentUser();
+  if(UI.view==='dashboard') return c.innerHTML = viewDashboard(u);
+  if(UI.view==='calendar') return c.innerHTML = viewCalendar(u), wireCalendar();
+  if(UI.view==='firefighters' && u.role==='admin') return c.innerHTML = viewFirefighters();
+  if(UI.view==='holidays' && u.role==='admin') return c.innerHTML = viewHolidays();
+  if(UI.view==='generate' && u.role==='admin') return c.innerHTML = viewGenerate();
+  if(UI.view==='swaps') return c.innerHTML = viewSwaps(u);
+  if(UI.view==='approval' && u.role==='admin') return c.innerHTML = viewApproval();
+  if(UI.view==='myrestrictions' && u.role==='bombeiro') return c.innerHTML = viewMyRestrictions(u);
+  if(UI.view==='notifications') return c.innerHTML = viewNotifications(u);
+  if(UI.view==='audit' && u.role==='admin') return c.innerHTML = viewAudit();
+  UI.view='dashboard'; return c.innerHTML = viewDashboard(u);
+}
+
+/* ============ DASHBOARD ============ */
+function viewDashboard(u){
+  const m = computeMetrics(DB.year);
+  const pendingSwaps = DB.swaps.filter(s=>s.status==='pendente').length;
+  const pendingReviews = DB.reviews.filter(r=>r.status==='pendente').length;
+  const onVacToday = DB.firefighters.filter(f=>isOnVacation(f, iso(new Date()))).length;
+
+  let rows = DB.firefighters.map(f=>{
+    return `<tr><td>${f.name}</td><td>${statusPill(f.status)}</td>
+      <td>${m.counts[f.id]||0}</td><td>${m.blackCounts[f.id]||0}</td><td>${m.redCounts[f.id]||0}</td></tr>`;
+  }).join('');
+
+  return `
+    <div class="grid g4" style="margin-bottom:20px;">
+      <div class="card"><h3>Ano vigente</h3><div class="stat">${DB.year}</div></div>
+      <div class="card"><h3>Dias sem cobertura</h3><div class="stat" style="color:${m.uncovered?'#b7312c':'inherit'}">${m.uncovered}</div></div>
+      <div class="card"><h3>Índice de justiça</h3><div class="stat">${m.fairness}<span style="font-size:14px;">/100</span></div></div>
+      <div class="card"><h3>Desvio máx. plantões</h3><div class="stat">${m.deviation}</div></div>
+    </div>
+    <div class="grid g3" style="margin-bottom:20px;">
+      <div class="card"><h3>Trocas pendentes</h3><div class="stat small">${pendingSwaps}</div></div>
+      <div class="card"><h3>Revisões pendentes</h3><div class="stat small">${pendingReviews}</div></div>
+      <div class="card"><h3>Bombeiros de férias hoje</h3><div class="stat small">${onVacToday}</div></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:10px;">Distribuição por bombeiro</h3>
+      <table>
+        <thead><tr><th>Nome</th><th>Status</th><th>Total plantões</th><th>Escala preta</th><th>Escala vermelha</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="5" style="color:#8a8f84">Nenhum bombeiro cadastrado.</td></tr>`}</tbody>
+      </table>
+    </div>
+  `;
+}
+function statusPill(s){
+  if(s==='ativo') return `<span class="pill green">Ativo</span>`;
+  if(s==='ferias') return `<span class="pill gray">Férias</span>`;
+  return `<span class="pill amber">Afastado</span>`;
+}
+
+/* ============ CALENDAR ============ */
+function viewCalendar(u){
+  const year = UI.calYear, month = UI.calMonth;
+  const days = daysInMonth(year, month);
+  const firstDow = fromIso(days[0]).getDay();
+  const cells = [];
+  for(let i=0;i<firstDow;i++) cells.push('<div class="cal-cell empty"></div>');
+  days.forEach(day=>{
+    const id = DB.schedule[day];
+    const ff = id ? ffById(id) : null;
+    const type = scaleType(day);
+    const holi = isHoliday(day);
+    const dNum = fromIso(day).getDate();
+    let cls = 'cal-cell '+(type==='vermelha' ? 'bar-red':'bar-black');
+    let flagBlocked = false;
+    if(u.role==='bombeiro'){
+      if(isOnVacation(u.ff, day)) cls+=' vac';
+      if(isUnavailable(u.ff, day)) flagBlocked = true;
+    }
+    cells.push(`<div class="${cls} ${flagBlocked?'blocked-flag':''}" onclick="openDay('${day}')">
+      <div class="cal-date">${dNum}</div>
+      ${holi?`<span class="cal-holi">${holi.name}</span>`:''}
+      <div class="cal-name">${ff? ff.name.split(' ')[0] : '<span style=\"color:#c33\">—</span>'}</div>
+    </div>`);
+  });
+
+  return `
+    <div class="cal-head">
+      <h3>${MONTHS[month]} ${year}</h3>
+      <div class="cal-nav">
+        <button class="btn ghost sm" onclick="calNav(-1)">‹ Anterior</button>
+        <select id="calYearSel" style="margin:0 6px;">${yearOptions(year)}</select>
+        <button class="btn ghost sm" onclick="calNav(1)">Próximo ›</button>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i style="background:#222"></i>Escala preta (dia útil)</span>
+      <span><i style="background:var(--red)"></i>Escala vermelha (fds/feriado)</span>
+      <span><i style="background:#b9bdb2;background-image:repeating-linear-gradient(135deg,#b9bdb2,#b9bdb2 3px,#8f938a 3px,#8f938a 6px)"></i>Férias</span>
+      <span><i style="background:#3568b0"></i>Bloqueado por indisponibilidade</span>
+    </div>
+    <div class="cal-grid">
+      ${DOW_SHORT.map(d=>`<div class="cal-dow">${d}</div>`).join('')}
+      ${cells.join('')}
+    </div>
+    <div id="dayModalHost"></div>
+  `;
+}
+function yearOptions(sel){
+  let out=''; for(let y=DB.year-1;y<=DB.year+3;y++){ out+=`<option value="${y}" ${y===sel?'selected':''}>${y}</option>`; } return out;
+}
+function wireCalendar(){
+  const sel = document.getElementById('calYearSel');
+  if(sel) sel.onchange = e=>{ UI.calYear = parseInt(e.target.value); render(); };
+}
+function calNav(dir){
+  UI.calMonth += dir;
+  if(UI.calMonth<0){UI.calMonth=11; UI.calYear--;}
+  if(UI.calMonth>11){UI.calMonth=0; UI.calYear++;}
+  render();
+}
+function openDay(day){
+  const u = currentUser();
+  const id = DB.schedule[day];
+  const ff = id ? ffById(id) : null;
+  const type = scaleType(day);
+  const holi = isHoliday(day);
+  const host = document.getElementById('dayModalHost');
+  const isAdmin = u.role==='admin';
+
+  const options = DB.firefighters.map(f=>`<option value="${f.id}" ${f.id===id?'selected':''}>${f.name} ${!isEligible(f,day)?'(indisponível)':''}</option>`).join('');
+
+  host.innerHTML = `
+    <div class="modal-bg" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <h3>${fromIso(day).toLocaleDateString('pt-BR',{weekday:'long', day:'2-digit', month:'long', year:'numeric'})}</h3>
+        <p style="margin-top:-8px;"><span class="pill ${type==='vermelha'?'red':'black'}">${type==='vermelha'?'Escala vermelha':'Escala preta'}</span>
+        ${holi?`&nbsp;<span class="pill amber">${holi.name}</span>`:''}</p>
+        <div class="field">
+          <label class="f">Bombeiro responsável</label>
+          ${isAdmin ? `<select id="dayFF" style="width:100%">${options}</select>` : `<div>${ff?ff.name:'Sem cobertura'}</div>`}
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+          <button class="btn ghost sm" onclick="closeModal()">Fechar</button>
+          ${isAdmin ? `<button class="btn sm" onclick="assignDay('${day}')">Salvar</button>` : ''}
+          ${(!isAdmin && ff && ff.id===u.id) ? `<button class="btn sm" onclick="startSwap('${day}')">Solicitar troca</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+function closeModal(){ document.getElementById('dayModalHost').innerHTML=''; }
+function assignDay(day){
+  const sel = document.getElementById('dayFF');
+  const newId = sel.value;
+  const ff = ffById(newId);
+  if(!isEligible(ff, day)){
+    if(!confirm(`${ff.name} está indisponível/férias nesta data. Confirmar mesmo assim?`)) return;
+  }
+  if(hasRestConflict(newId, day, DB.schedule)){
+    if(!confirm(`${ff.name} não terá 24h de descanso. Confirmar mesmo assim?`)) return;
+  }
+  DB.schedule[day] = newId;
+  save();
+  log(`Plantão de ${day} atribuído manualmente a ${ff.name}.`);
+  toast('Plantão atualizado.');
+  closeModal();
+  render();
+}
+
+/* ============ FIREFIGHTERS ============ */
+function viewFirefighters(){
+  const rows = DB.firefighters.map(f=>`
+    <tr>
+      <td><strong>${f.name}</strong><br><span style="color:#8a8f84;font-size:11.5px;">@${f.username}</span></td>
+      <td>${statusPill(f.status)}</td>
+      <td>${(f.vacations||[]).length} período(s)</td>
+      <td>${(f.unavailable||[]).length} data(s)</td>
+      <td style="text-align:right;">
+        <button class="btn ghost sm" onclick="editFF('${f.id}')">Editar</button>
+        <button class="btn ghost sm" onclick="toggleStatus('${f.id}')">Alternar status</button>
+      </td>
+    </tr>`).join('');
+  return `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+      <button class="btn" onclick="editFF(null)">+ Novo bombeiro</button>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Bombeiro</th><th>Status</th><th>Férias</th><th>Restrições</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div id="ffModalHost"></div>
+  `;
+}
+function toggleStatus(id){
+  const f = ffById(id);
+  const order = ['ativo','ferias','afastado'];
+  f.status = order[(order.indexOf(f.status)+1)%order.length];
+  save(); log(`Status de ${f.name} alterado para ${f.status}.`); render();
+}
+function editFF(id){
+  const f = id ? ffById(id) : {id:null, name:'', username:'', status:'ativo', vacations:[], unavailable:[]};
+  UI.editFF = JSON.parse(JSON.stringify(f));
+  const host = document.getElementById('ffModalHost');
+  host.innerHTML = `
+    <div class="modal-bg" onclick="if(event.target===this) document.getElementById('ffModalHost').innerHTML=''">
+      <div class="modal">
+        <h3>${id?'Editar bombeiro':'Novo bombeiro'}</h3>
+        <div class="field"><label class="f">Nome completo</label><input id="ffName" style="width:100%" value="${f.name}"></div>
+        <div class="field"><label class="f">Nome de usuário</label><input id="ffUser" style="width:100%" value="${f.username}"></div>
+        <div class="field"><label class="f">Status</label>
+          <select id="ffStatus" style="width:100%">
+            <option value="ativo" ${f.status==='ativo'?'selected':''}>Ativo</option>
+            <option value="ferias" ${f.status==='ferias'?'selected':''}>Férias</option>
+            <option value="afastado" ${f.status==='afastado'?'selected':''}>Afastado</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+          <button class="btn ghost sm" onclick="document.getElementById('ffModalHost').innerHTML=''">Cancelar</button>
+          ${id?`<button class="btn ghost sm" style="border-color:#b7312c;color:#b7312c" onclick="removeFF('${id}')">Remover</button>`:''}
+          <button class="btn sm" onclick="saveFF('${id||''}')">Salvar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function saveFF(id){
+  const name = document.getElementById('ffName').value.trim();
+  const username = document.getElementById('ffUser').value.trim();
+  const status = document.getElementById('ffStatus').value;
+  if(!name || !username){ toast('Preencha nome e usuário.'); return; }
+  if(id){
+    const f = ffById(id); f.name=name; f.username=username; f.status=status;
+  }else{
+    if(DB.firefighters.length>=12){ toast('Limite de 12 bombeiros atingido.'); return; }
+    DB.firefighters.push({id:'ff'+Date.now(), name, username, status, vacations:[], unavailable:[]});
+  }
+  save(); log(`Bombeiro ${name} salvo.`); document.getElementById('ffModalHost').innerHTML=''; render();
+}
+function removeFF(id){
+  if(!confirm('Remover este bombeiro? O histórico de escala será mantido mas ele não receberá novos plantões.')) return;
+  DB.firefighters = DB.firefighters.filter(f=>f.id!==id);
+  save(); document.getElementById('ffModalHost').innerHTML=''; render();
+}
+
+/* ============ HOLIDAYS ============ */
+function viewHolidays(){
+  const rows = DB.holidays.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(h=>`
+    <tr><td>${fromIso(h.date).toLocaleDateString('pt-BR')}</td><td>${h.name}</td>
+    <td><span class="pill ${h.level==='nacional'?'black':h.level==='estadual'?'blue':'amber'}">${h.level}</span></td>
+    <td style="text-align:right;"><button class="btn ghost sm" onclick="removeHoliday('${h.date}','${h.name.replace(/'/g,"\\'")}')">Remover</button></td></tr>
+  `).join('');
+  return `
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-bottom:10px;">Adicionar feriado</h3>
+      <div class="grid g3">
+        <div class="field"><label class="f">Data</label><input id="hDate" type="date"></div>
+        <div class="field"><label class="f">Nome</label><input id="hName" placeholder="Ex: Aniversário da cidade"></div>
+        <div class="field"><label class="f">Abrangência</label>
+          <select id="hLevel"><option value="nacional">Nacional</option><option value="estadual">Estadual</option><option value="municipal">Municipal</option></select>
+        </div>
+      </div>
+      <button class="btn" onclick="addHoliday()">Adicionar</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>Data</th><th>Nome</th><th>Nível</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+  `;
+}
+function addHoliday(){
+  const date = document.getElementById('hDate').value;
+  const name = document.getElementById('hName').value.trim();
+  const level = document.getElementById('hLevel').value;
+  if(!date || !name){ toast('Preencha data e nome.'); return; }
+  DB.holidays.push({date,name,level});
+  save(); log(`Feriado "${name}" cadastrado em ${date}.`); render();
+}
+function removeHoliday(date,name){
+  DB.holidays = DB.holidays.filter(h=>!(h.date===date && h.name===name));
+  save(); render();
+}
+
+/* ============ GENERATE ============ */
+function viewGenerate(){
+  const m = computeMetrics(DB.year);
+  return `
+    <div class="card" style="margin-bottom:18px;">
+      <h3 style="margin-bottom:6px;">Geração automática — ano ${DB.year}</h3>
+      <p style="color:#5a6058;font-size:13.5px;">O motor distribui os 365 (ou 366) dias entre os 12 bombeiros, respeitando férias, restrições
+      individuais, descanso mínimo de 24h entre plantões e equilíbrio entre escala preta e vermelha. Gerar novamente substitui a escala atual do ano.</p>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:14px;">
+        <select id="genYear">${yearOptions(DB.year)}</select>
+        <button class="btn" onclick="runGenerate()">Gerar escala anual</button>
+        <button class="btn ghost" onclick="runGenerateMonth()">Gerar apenas mês atual</button>
+      </div>
+    </div>
+    <div class="grid g4">
+      <div class="card"><h3>Cobertura</h3><div class="stat">${365-m.uncovered}/${daysInYear(DB.year).length}</div></div>
+      <div class="card"><h3>Fairness score</h3><div class="stat">${m.fairness}</div></div>
+      <div class="card"><h3>Desvio máx.</h3><div class="stat">${m.deviation}</div></div>
+      <div class="card"><h3>Dias descobertos</h3><div class="stat" style="color:${m.uncovered?'#b7312c':'inherit'}">${m.uncovered}</div></div>
+    </div>
+    ${DB.scheduleStatus==='draft' && Object.keys(DB.schedule).length ? `
+      <div class="card" style="margin-top:18px;">
+        <h3 style="margin-bottom:10px;">Enviar para aprovação</h3>
+        <p style="font-size:13px;color:#5a6058;">Notifica todos os bombeiros para que aceitem a escala ou solicitem revisão.</p>
+        <button class="btn dark" onclick="sendForApproval()">Enviar escala para aprovação</button>
+      </div>` : ''}
+  `;
+}
+function runGenerate(){
+  const year = parseInt(document.getElementById('genYear').value);
+  DB.year = year; save();
+  const res = generateSchedule(year);
+  toast(`Escala de ${year} gerada. ${res.unresolved.length? res.unresolved.length+' dias precisam de ajuste manual.':'Cobertura completa.'}`);
+  render();
+}
+function runGenerateMonth(){
+  const today = new Date();
+  const days = daysInMonth(today.getFullYear(), today.getMonth());
+  const counts={}, blackCounts={}, redCounts={};
+  DB.firefighters.forEach(f=>{counts[f.id]=0;blackCounts[f.id]=0;redCounts[f.id]=0;});
+  Object.keys(DB.schedule).forEach(d=>{
+    const id=DB.schedule[d]; if(!id) return;
+    counts[id]=(counts[id]||0)+1;
+    if(scaleType(d)==='vermelha') redCounts[id]=(redCounts[id]||0)+1; else blackCounts[id]=(blackCounts[id]||0)+1;
+  });
+  days.forEach(day=>{
+    const type = scaleType(day);
+    let candidates = DB.firefighters.filter(f=> isEligible(f, day) && !hasRestConflict(f.id, day, DB.schedule));
+    if(candidates.length===0) candidates = DB.firefighters.filter(f=> isEligible(f, day));
+    if(candidates.length===0) return;
+    candidates.sort((a,b)=>{
+      const tA = type==='vermelha'?redCounts[a.id]:blackCounts[a.id], tB = type==='vermelha'?redCounts[b.id]:blackCounts[b.id];
+      if(counts[a.id]!==counts[b.id]) return counts[a.id]-counts[b.id];
+      return tA-tB;
+    });
+    const chosen = candidates[0];
+    DB.schedule[day]=chosen.id; counts[chosen.id]++;
+    if(type==='vermelha') redCounts[chosen.id]++; else blackCounts[chosen.id]++;
+  });
+  save(); log(`Escala mensal de ${MONTHS[today.getMonth()]} regenerada.`); toast('Mês atual regenerado.'); render();
+}
+function sendForApproval(){
+  DB.scheduleStatus='sent'; save();
+  DB.firefighters.forEach(f=> notify(`Nova escala de ${DB.year} disponível para sua avaliação.`, f.id));
+  log('Escala enviada para aprovação de todos os bombeiros.');
+  toast('Notificações enviadas.'); render();
+}
+
+/* ============ SWAPS ============ */
+function viewSwaps(u){
+  const mine = u.role==='bombeiro' ? DB.swaps.filter(s=>s.fromId===u.id || s.toId===u.id) : DB.swaps;
+  const rows = mine.slice().reverse().map(s=>`
+    <tr>
+      <td>${ffById(s.fromId)?.name||'?'}</td>
+      <td>${fromIso(s.date).toLocaleDateString('pt-BR')}</td>
+      <td>${ffById(s.toId)?.name||'?'}</td>
+      <td>${statusPillSwap(s.status)}</td>
+      <td style="text-align:right;">${swapActions(s,u)}</td>
+    </tr>`).join('');
+  return `
+    <div class="card" style="margin-bottom:16px;">
+      <table><thead><tr><th>De</th><th>Data do plantão</th><th>Para</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="5" style="color:#8a8f84">Nenhuma troca registrada.</td></tr>`}</tbody></table>
+    </div>
+    ${u.role==='bombeiro' ? `<p style="font-size:12.5px;color:#8a8f84;">Para solicitar uma troca, abra o dia desejado no Calendário e clique em "Solicitar troca".</p>`:''}
+  `;
+}
+function statusPillSwap(s){
+  if(s==='aceito') return `<span class="pill green">Aceito</span>`;
+  if(s==='recusado') return `<span class="pill red">Recusado</span>`;
+  if(s==='aguardando_admin') return `<span class="pill amber">Aguardando admin</span>`;
+  return `<span class="pill gray">Pendente</span>`;
+}
+function swapActions(s,u){
+  if(u.role==='bombeiro' && s.toId===u.id && s.status==='pendente'){
+    return `<button class="btn sm" onclick="respondSwap('${s.id}',true)">Aceitar</button>
+            <button class="btn ghost sm" onclick="respondSwap('${s.id}',false)">Recusar</button>`;
+  }
+  if(u.role==='admin' && s.status==='aguardando_admin'){
+    return `<button class="btn sm" onclick="adminResolveSwap('${s.id}',true)">Aprovar</button>
+            <button class="btn ghost sm" onclick="adminResolveSwap('${s.id}',false)">Rejeitar</button>`;
+  }
+  return '';
+}
+function startSwap(day){
+  const u = currentUser();
+  const others = DB.firefighters.filter(f=>f.id!==u.id);
+  const host = document.getElementById('dayModalHost');
+  host.innerHTML = `
+    <div class="modal-bg" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <h3>Solicitar troca — ${fromIso(day).toLocaleDateString('pt-BR')}</h3>
+        <div class="field">
+          <label class="f">Trocar com</label>
+          <select id="swapTarget" style="width:100%">${others.map(f=>`<option value="${f.id}">${f.name}</option>`).join('')}</select>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+          <button class="btn ghost sm" onclick="closeModal()">Cancelar</button>
+          <button class="btn sm" onclick="submitSwap('${day}')">Enviar solicitação</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function submitSwap(day){
+  const u = currentUser();
+  const toId = document.getElementById('swapTarget').value;
+  const swap = {id:'sw'+Date.now(), fromId:u.id, date:day, toId, status:'pendente'};
+  DB.swaps.push(swap); save();
+  notify(`${u.name} quer trocar o plantão de ${fromIso(day).toLocaleDateString('pt-BR')} com você.`, toId);
+  log(`${u.name} solicitou troca do dia ${day} com ${ffById(toId).name}.`);
+  toast('Solicitação enviada.'); closeModal(); render();
+}
+function respondSwap(id, accept){
+  const s = DB.swaps.find(x=>x.id===id);
+  if(!accept){ s.status='recusado'; save(); notify(`${ffById(s.toId).name} recusou a troca do dia ${fromIso(s.date).toLocaleDateString('pt-BR')}.`,'admin'); render(); return; }
+  // validate rules: eligibility + rest
+  const target = ffById(s.toId);
+  const scheduleCopy = {...DB.schedule, [s.date]: s.toId};
+  const violatesEligibility = !isEligible(target, s.date);
+  const violatesRest = hasRestConflict(s.toId, s.date, DB.schedule);
+  if(violatesEligibility || violatesRest){
+    s.status='aguardando_admin'; save();
+    notify(`Troca do dia ${fromIso(s.date).toLocaleDateString('pt-BR')} entre ${ffById(s.fromId).name} e ${target.name} viola regras e precisa de aprovação.`,'admin');
+    toast('Troca encaminhada ao administrador (viola regras).');
+  }else{
+    DB.schedule[s.date] = s.toId; s.status='aceito'; save();
+    log(`Troca aceita: ${target.name} assume o plantão de ${s.date}.`);
+    toast('Troca confirmada.');
+  }
+  render();
+}
+function adminResolveSwap(id, approve){
+  const s = DB.swaps.find(x=>x.id===id);
+  if(approve){ DB.schedule[s.date]=s.toId; s.status='aceito'; log(`Admin aprovou troca do dia ${s.date}.`); }
+  else{ s.status='recusado'; log(`Admin rejeitou troca do dia ${s.date}.`); }
+  save(); render();
+}
+
+/* ============ APPROVAL (admin view of reviews) ============ */
+function viewApproval(){
+  const rows = DB.reviews.slice().reverse().map(r=>`
+    <tr><td>${ffById(r.ffId)?.name||'?'}</td><td>${r.comment}</td><td>${statusPillReview(r.status)}</td>
+    <td style="text-align:right;">${r.status==='pendente'?`<button class="btn sm" onclick="resolveReview('${r.id}',true)">Aprovar</button>
+      <button class="btn ghost sm" onclick="resolveReview('${r.id}',false)">Rejeitar</button>`:''}</td></tr>
+  `).join('');
+  return `
+    <div class="card">
+      <h3 style="margin-bottom:10px;">Solicitações de revisão de escala</h3>
+      <table><thead><tr><th>Bombeiro</th><th>Comentário</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="4" style="color:#8a8f84">Nenhuma solicitação.</td></tr>`}</tbody></table>
+    </div>
+  `;
+}
+function statusPillReview(s){
+  if(s==='aprovado') return `<span class="pill green">Aprovado</span>`;
+  if(s==='rejeitado') return `<span class="pill red">Rejeitado</span>`;
+  return `<span class="pill amber">Pendente</span>`;
+}
+function resolveReview(id, approve){
+  const r = DB.reviews.find(x=>x.id===id);
+  r.status = approve?'aprovado':'rejeitado'; save();
+  notify(`Sua solicitação de revisão foi ${approve?'aprovada':'rejeitada'}.`, r.ffId);
+  log(`Revisão de ${ffById(r.ffId).name} ${approve?'aprovada':'rejeitada'}.`);
+  render();
+}
+
+/* ============ MY RESTRICTIONS (bombeiro) ============ */
+function viewMyRestrictions(u){
+  const f = u.ff;
+  const unavail = (f.unavailable||[]).slice().sort();
+  const vacs = (f.vacations||[]);
+  const accepted = DB.scheduleStatus==='sent';
+  return `
+    <div class="grid g2">
+      <div class="card">
+        <h3 style="margin-bottom:10px;">Datas indisponíveis</h3>
+        <div class="field"><input id="unavDate" type="date"><button class="btn sm" style="margin-left:8px;" onclick="addUnavailable()">Adicionar</button></div>
+        <div class="tag-row">${unavail.map(d=>`<span class="chip">${fromIso(d).toLocaleDateString('pt-BR')}<button onclick="removeUnavailable('${d}')">×</button></span>`).join('') || '<span style="color:#8a8f84;font-size:13px;">Nenhuma data registrada.</span>'}</div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:10px;">Solicitar férias</h3>
+        <div class="field"><label class="f">Início</label><input id="vacStart" type="date"></div>
+        <div class="field"><label class="f">Fim</label><input id="vacEnd" type="date"></div>
+        <button class="btn sm" onclick="requestVacation()">Enviar solicitação</button>
+        <div class="tag-row" style="margin-top:12px;">${vacs.map(v=>`<span class="chip">${fromIso(v.start).toLocaleDateString('pt-BR')} → ${fromIso(v.end).toLocaleDateString('pt-BR')}</span>`).join('') || '<span style="color:#8a8f84;font-size:13px;">Nenhum período registrado.</span>'}</div>
+      </div>
+    </div>
+    ${accepted ? `
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-bottom:10px;">Escala ${DB.year}</h3>
+      <p style="font-size:13px;color:#5a6058;">Você recebeu a nova escala anual. Deseja aceitar ou solicitar revisão?</p>
+      <button class="btn" onclick="acceptSchedule()">Aceitar escala</button>
+      <button class="btn ghost" onclick="openReviewModal()">Solicitar revisão</button>
+    </div>` : ''}
+    <div id="reviewModalHost"></div>
+  `;
+}
+function addUnavailable(){
+  const u = currentUser(); const f = u.ff;
+  const d = document.getElementById('unavDate').value;
+  if(!d) return;
+  f.unavailable = f.unavailable||[];
+  if(!f.unavailable.includes(d)) f.unavailable.push(d);
+  save(); log(`${f.name} bloqueou a data ${d}.`); render();
+}
+function removeUnavailable(d){
+  const u = currentUser(); const f = u.ff;
+  f.unavailable = (f.unavailable||[]).filter(x=>x!==d);
+  save(); render();
+}
+function requestVacation(){
+  const u = currentUser(); const f = u.ff;
+  const start = document.getElementById('vacStart').value, end = document.getElementById('vacEnd').value;
+  if(!start||!end||start>end){ toast('Informe um período válido.'); return; }
+  f.vacations = f.vacations||[]; f.vacations.push({start,end});
+  save(); notify(`${f.name} solicitou férias de ${start} a ${end}.`, 'admin');
+  log(`${f.name} solicitou férias (${start} a ${end}).`);
+  toast('Solicitação enviada ao administrador.'); render();
+}
+function acceptSchedule(){
+  DB.scheduleStatus='accepted'; save();
+  const u = currentUser();
+  notify(`${u.name} aceitou a escala de ${DB.year}.`, 'admin');
+  log(`${u.name} aceitou a escala.`);
+  toast('Escala aceita!'); render();
+}
+function openReviewModal(){
+  const host = document.getElementById('reviewModalHost');
+  host.innerHTML = `
+    <div class="modal-bg" onclick="if(event.target===this) document.getElementById('reviewModalHost').innerHTML=''">
+      <div class="modal">
+        <h3>Solicitar revisão</h3>
+        <div class="field"><label class="f">Motivo</label><textarea id="reviewComment" rows="4" style="width:100%"></textarea></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn ghost sm" onclick="document.getElementById('reviewModalHost').innerHTML=''">Cancelar</button>
+          <button class="btn sm" onclick="submitReview()">Enviar</button>
+        </div>
+      </div>
+    </div>`;
+}
+function submitReview(){
+  const u = currentUser();
+  const comment = document.getElementById('reviewComment').value.trim();
+  if(!comment){ toast('Descreva o motivo.'); return; }
+  DB.reviews.push({id:'rv'+Date.now(), ffId:u.id, comment, status:'pendente'});
+  save(); notify(`${u.name} solicitou revisão da escala.`, 'admin');
+  log(`${u.name} solicitou revisão: "${comment}"`);
+  toast('Solicitação enviada.'); document.getElementById('reviewModalHost').innerHTML=''; render();
+}
+
+/* ============ NOTIFICATIONS ============ */
+function viewNotifications(u){
+  const list = DB.notifications.filter(n=>n.target===u.id).slice(0,80);
+  if(list.length) list.forEach(n=>n.read=true), save();
+  return `
+    <div class="card">
+      ${list.map(n=>`<div class="notif"><div>${n.text}<small>${new Date(n.t).toLocaleString('pt-BR')}</small></div></div>`).join('') || `<div class="empty-state">Nenhuma notificação.</div>`}
+    </div>
+    <p style="font-size:11.5px;color:#8a8f84;margin-top:10px;">* Notificações por e-mail seriam disparadas por um serviço de backend real; nesta demonstração ficam registradas aqui.</p>
+  `;
+}
+
+/* ============ AUDIT ============ */
+function viewAudit(){
+  return `
+    <div class="card">
+      ${DB.auditLog.slice(0,150).map(a=>`<div class="notif"><div>${a.action}<small>${new Date(a.t).toLocaleString('pt-BR')}</small></div></div>`).join('') || `<div class="empty-state">Sem eventos ainda.</div>`}
+    </div>
+  `;
+}
+
+/* ---- notif badge polling (simple) ---- */
+render();
+</script>
+</body>
+</html>
