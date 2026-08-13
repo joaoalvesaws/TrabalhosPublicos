@@ -1,0 +1,51 @@
+/* =========================================================
+   MontReal — Design Tokens
+   Paleta: off-white + tons terrosos (inspirada em papel,
+   couro e capas de livro antigas)
+   Inclua este arquivo em TODAS as páginas, antes de
+   qualquer CSS de componente.
+   ========================================================= */
+
+:root {
+  /* --- Cores base --- */
+  --color-bg:        #F6F1E7; /* off-white principal (papel) */
+  --color-bg-alt:    #EDE3D2; /* off-white mais escuro p/ seções alternadas */
+  --color-surface:   #FFFDF9; /* cards e superfícies elevadas */
+  --color-ink:       #3B2E24; /* texto principal (marrom quase-preto) */
+  --color-ink-soft:  #6B5B4C; /* texto secundário */
+
+  /* --- Tons terrosos de destaque --- */
+  --color-clay:      #A65A34; /* terracota — CTAs e destaques */
+  --color-clay-dark: #8A472A; /* hover / estados ativos */
+  --color-olive:     #6E7A54; /* verde-oliva — segundo destaque */
+  --color-gold:      #C08A3E; /* ocre/dourado — detalhes e ícones */
+  --color-line:      #DBCBB0; /* linhas, bordas, divisores */
+
+  /* --- Tipografia --- */
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body:    'Work Sans', 'Segoe UI', sans-serif;
+  --font-caption: 'Work Sans', sans-serif;
+
+  /* --- Escala tipográfica --- */
+  --fs-hero:   clamp(2.4rem, 5vw, 4rem);
+  --fs-h1:     clamp(1.9rem, 3.2vw, 2.6rem);
+  --fs-h2:     clamp(1.4rem, 2.2vw, 1.8rem);
+  --fs-body:   1rem;
+  --fs-small:  0.85rem;
+
+  /* --- Espaçamento --- */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.75rem;
+  --space-lg: 3rem;
+  --space-xl: 5rem;
+
+  /* --- Layout --- */
+  --content-width: 1120px;
+  --radius-sm: 4px;
+  --radius-md: 10px;
+
+  /* --- Sombra suave (papel levantando) --- */
+  --shadow-card: 0 6px 18px rgba(59, 46, 36, 0.08);
+  --shadow-lift: 0 12px 30px rgba(59, 46, 36, 0.14);
+}

@@ -1,0 +1,34 @@
+<!-- =========================================================
+     COMPONENTE: Header / Navbar
+     Ver README.md nesta pasta para instruções de instalação.
+     ========================================================= -->
+<header class="site-header" id="site-header">
+  <div class="container site-header__inner">
+
+    <button class="site-header__menu-btn" id="menuToggle" aria-expanded="false" aria-controls="mobileNav">
+      <span class="visually-hidden">Abrir menu</span>
+      <span class="site-header__menu-label">Menu</span>
+    </button>
+
+    <a href="#top" class="site-header__logo">MontReal</a>
+
+    <form class="site-header__search" role="search" onsubmit="return false;">
+      <label for="searchInput" class="visually-hidden">Buscar</label>
+      <input type="search" id="searchInput" placeholder="Buscar livros, autores...">
+      <button type="submit" class="site-header__search-btn" aria-label="Buscar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Menu mobile / lateral, aberto pelo botão "Menu" -->
+  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <a href="#historia">Nossa história</a>
+    <a href="#contato">Contato</a>
+    <a href="#localizacao">Localização</a>
+    <a href="#feedback">Feedback</a>
+  </nav>
+</header>

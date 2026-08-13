@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MontReal — Livraria</title>
+
+<!-- Tokens de design e estilos globais -->
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/global.css">
+
+<!-- Estilos de cada componente (mesma ordem em que aparecem na página) -->
+<link rel="stylesheet" href="components/01-header/header.css">
+<link rel="stylesheet" href="components/02-hero/hero.css">
+<link rel="stylesheet" href="components/03-historia/historia.css">
+<link rel="stylesheet" href="components/04-info-cards/info-cards.css">
+<link rel="stylesheet" href="components/05-divider/divider.css">
+<link rel="stylesheet" href="components/06-contato/contato.css">
+<link rel="stylesheet" href="components/07-localizacao/localizacao.css">
+<link rel="stylesheet" href="components/08-feedback/feedback.css">
+<link rel="stylesheet" href="components/09-footer/footer.css">
+</head>
+<body>
+
+<!-- =================== 01. HEADER =================== -->
+<header class="site-header" id="site-header">
+  <div class="container site-header__inner">
+
+    <button class="site-header__menu-btn" id="menuToggle" aria-expanded="false" aria-controls="mobileNav">
+      <span class="visually-hidden">Abrir menu</span>
+      <span class="site-header__menu-label">Menu</span>
+    </button>
+
+    <a href="#top" class="site-header__logo">MontReal</a>
+
+    <form class="site-header__search" role="search" onsubmit="return false;">
+      <label for="searchInput" class="visually-hidden">Buscar</label>
+      <input type="search" id="searchInput" placeholder="Buscar livros, autores...">
+      <button type="submit" class="site-header__search-btn" aria-label="Buscar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <a href="#historia">Nossa história</a>
+    <a href="#contato">Contato</a>
+    <a href="#localizacao">Localização</a>
+    <a href="#feedback">Feedback</a>
+  </nav>
+</header>
+
+<!-- =================== 02. HERO =================== -->
+<section class="hero section--alt" id="top" aria-label="Boas-vindas">
+  <div class="container hero__inner">
+
+    <button class="hero__arrow hero__arrow--prev" id="heroPrev" aria-label="Slide anterior">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="hero__slides" id="heroSlides">
+      <article class="hero__slide" data-slide="0">
+        <div class="hero__text">
+          <h1>Seja<br>Bem-vindo</h1>
+          <svg class="hero__book-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 5.5C2 5.5 5 4 9 4s7 1.5 7 1.5v14S13 18 9 18s-7 1.5-7 1.5V5.5Z"/>
+            <path d="M22 5.5C22 5.5 19 4 15 4s-3 .3-3 .3v15.2s2-1.5 3-1.5 5 1.5 7 1.5V5.5Z" opacity=".55"/>
+          </svg>
+        </div>
+
+        <div class="hero__featured">
+          <div class="hero__book dog-ear">
+            <span class="hero__book-title">O LIVRO<br>DO DESIGN</span>
+          </div>
+          <div class="hero__caption">
+            <h2>O livro do <span class="hero__circle">Design</span></h2>
+            <a href="#" class="btn btn--outline">Consultar</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <button class="hero__arrow hero__arrow--next" id="heroNext" aria-label="Próximo slide">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- =================== 03. NOSSA HISTÓRIA =================== -->
+<section class="historia section" id="historia" aria-labelledby="historia-title">
+  <div class="container historia__inner">
+    <div class="historia__text">
+      <span class="eyebrow">Desde o primeiro balcão</span>
+      <h2 id="historia-title">Nossa história</h2>
+      <p>Texto contando a história da livraria: como tudo começou, quem
+        fundou e o que torna a MontReal um ponto de encontro para quem
+        ama livros.</p>
+    </div>
+    <div class="historia__image img-placeholder dog-ear">
+      <span>Fachada da livraria MontReal</span>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 04. BLOCOS INFORMATIVOS =================== -->
+<section class="info-cards section" aria-label="Sobre a livraria">
+  <div class="container info-cards__grid">
+
+    <article class="info-card">
+      <h3>Início</h3>
+      <p>Corpo de texto para adicionar mais informações, além de substituir.</p>
+      <div class="info-card__image img-placeholder dog-ear">
+        <span>Equipe da livraria</span>
+      </div>
+    </article>
+
+    <article class="info-card info-card--offset">
+      <div class="info-card__image img-placeholder dog-ear">
+        <span>Primeiro cliente da MontReal</span>
+      </div>
+      <h3>Primeiro cliente</h3>
+      <p>Corpo de texto para explicar melhor o ponto principal.</p>
+    </article>
+
+    <article class="info-card">
+      <h3>ExpoLib</h3>
+      <p>Corpo de texto para outras informações que você queira compartilhar.</p>
+      <div class="info-card__image img-placeholder dog-ear">
+        <span>Feira ExpoLib</span>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- =================== 05. DIVISOR =================== -->
+<div class="divider" role="separator" aria-hidden="true">
+  <span class="ribbon-divider">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M2 5.5C2 5.5 5 4 9 4s7 1.5 7 1.5v14S13 18 9 18s-7 1.5-7 1.5V5.5Z"/>
+      <path d="M22 5.5C22 5.5 19 4 15 4s-3 .3-3 .3v15.2s2-1.5 3-1.5 5 1.5 7 1.5V5.5Z" opacity=".55"/>
+    </svg>
+  </span>
+</div>
+
+<!-- =================== 06. CONTATO =================== -->
+<section class="contato section section--alt" id="contato" aria-labelledby="contato-title">
+  <div class="container contato__inner">
+
+    <div class="contato__info">
+      <h2 id="contato-title">Contato</h2>
+
+      <dl class="contato__list">
+        <div class="contato__item">
+          <dt>Telefone</dt>
+          <dd>Texto para explicar melhor o ponto principal.</dd>
+        </div>
+        <div class="contato__item">
+          <dt>Email</dt>
+          <dd>Corpo de texto para qualquer informação que você queira
+            compartilhar. Adicione os pontos principais, citações ou
+            contexto.</dd>
+        </div>
+        <div class="contato__item">
+          <dt>Instagram</dt>
+          <dd>Corpo de texto para explicar melhor o ponto principal.
+            Forneça detalhes, explicações e contexto.</dd>
+        </div>
+      </dl>
+
+      <div class="contato__actions">
+        <a href="https://wa.me/5500000000000" class="btn btn--primary" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="tel:+5500000000000" class="btn btn--outline">Ligar agora</a>
+      </div>
+    </div>
+
+    <div class="contato__image img-placeholder dog-ear">
+      <span>Fundadora da livraria MontReal</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- =================== 07. LOCALIZAÇÃO =================== -->
+<section class="localizacao section" id="localizacao" aria-labelledby="localizacao-title">
+  <div class="container">
+    <h2 id="localizacao-title">Localização</h2>
+    <div class="localizacao__map dog-ear">
+      <iframe
+        title="Mapa de localização da livraria MontReal"
+        src="https://www.google.com/maps?q=livraria&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 08. FEEDBACK =================== -->
+<section class="feedback section section--alt" id="feedback" aria-labelledby="feedback-title">
+  <div class="container">
+    <h2 id="feedback-title">Feedback</h2>
+
+    <div class="feedback__grid" id="feedbackGrid">
+      <blockquote class="feedback__card">
+        <p>&ldquo;Um elogio incrível&rdquo;</p>
+        <footer>
+          <span class="feedback__avatar" aria-hidden="true"></span>
+          <span><strong>Nome</strong><small>Descrição</small></span>
+        </footer>
+      </blockquote>
+      <blockquote class="feedback__card">
+        <p>&ldquo;Um feedback fantástico&rdquo;</p>
+        <footer>
+          <span class="feedback__avatar" aria-hidden="true"></span>
+          <span><strong>Nome</strong><small>Descrição</small></span>
+        </footer>
+      </blockquote>
+      <blockquote class="feedback__card">
+        <p>&ldquo;Uma avaliação positiva&rdquo;</p>
+        <footer>
+          <span class="feedback__avatar" aria-hidden="true"></span>
+          <span><strong>Nome</strong><small>Descrição</small></span>
+        </footer>
+      </blockquote>
+      <blockquote class="feedback__card">
+        <p>&ldquo;Um elogio incrível&rdquo;</p>
+        <footer>
+          <span class="feedback__avatar" aria-hidden="true"></span>
+          <span><strong>Nome</strong><small>Descrição</small></span>
+        </footer>
+      </blockquote>
+      <blockquote class="feedback__card">
+        <p>&ldquo;Um feedback fantástico&rdquo;</p>
+        <footer>
+          <span class="feedback__avatar" aria-hidden="true"></span>
+          <span><strong>Nome</strong><small>Descrição</small></span>
+        </footer>
+      </blockquote>
+      <blockquote class="feedback__card">
+        <p>&ldquo;Uma avaliação positiva&rdquo;</p>
+        <footer>
+          <span class="feedback__avatar" aria-hidden="true"></span>
+          <span><strong>Nome</strong><small>Descrição</small></span>
+        </footer>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 09. FOOTER =================== -->
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+
+    <div class="site-footer__brand">
+      <p class="site-footer__logo">MontReal</p>
+      <div class="site-footer__socials">
+        <a href="#" aria-label="Localização">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+        </a>
+        <a href="#" aria-label="WhatsApp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 20l1-5.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+        </a>
+        <a href="#" aria-label="Email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <nav class="site-footer__col">
+      <h4>Tópicos</h4>
+      <a href="#">Página</a>
+      <a href="#">Página</a>
+      <a href="#">Página</a>
+    </nav>
+    <nav class="site-footer__col">
+      <h4>Tópicos</h4>
+      <a href="#">Página</a>
+      <a href="#">Página</a>
+      <a href="#">Página</a>
+    </nav>
+    <nav class="site-footer__col">
+      <h4>Tópicos</h4>
+      <a href="#">Página</a>
+      <a href="#">Página</a>
+      <a href="#">Página</a>
+    </nav>
+
+  </div>
+  <p class="site-footer__copy">&copy; <span id="footerYear"></span> MontReal. Todos os direitos reservados.</p>
+</footer>
+
+<!-- Scripts de cada componente -->
+<script src="components/01-header/header.js"></script>
+<script src="components/02-hero/hero.js"></script>
+<script src="components/09-footer/footer.js"></script>
+
+</body>
+</html>

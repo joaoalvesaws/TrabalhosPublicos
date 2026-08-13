@@ -1,0 +1,20 @@
+/* =========================================================
+   COMPONENTE: Nossa história
+   Depende de variables.css e global.css (ver README).
+   ========================================================= */
+
+.historia__inner {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.historia__text p { max-width: 40ch; }
+
+.historia__image { aspect-ratio: 16 / 10; }
+
+@media (max-width: 780px) {
+  .historia__inner { grid-template-columns: 1fr; }
+  .historia__image { order: -1; }
+}

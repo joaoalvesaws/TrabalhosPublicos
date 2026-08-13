@@ -1,0 +1,101 @@
+/* =========================================================
+   COMPONENTE: Hero / Banner de boas-vindas
+   Depende de variables.css e global.css (ver README).
+   ========================================================= */
+
+.hero { padding: var(--space-lg) 0; }
+
+.hero__inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.hero__arrow {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.hero__arrow:hover { background: var(--color-ink); color: var(--color-bg); }
+
+.hero__slides { overflow: hidden; }
+
+.hero__slide {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.hero__text h1 {
+  font-size: var(--fs-hero);
+  font-style: italic;
+  margin-bottom: var(--space-sm);
+}
+
+.hero__book-icon { color: var(--color-clay); }
+
+.hero__featured {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.hero__book {
+  width: 150px;
+  height: 190px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(160deg, var(--color-olive) 0%, var(--color-clay) 100%);
+  box-shadow: var(--shadow-lift);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm);
+  transform: rotate(-3deg);
+}
+.hero__book-title {
+  font-family: var(--font-display);
+  color: var(--color-bg);
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+.hero__caption h2 {
+  font-size: var(--fs-h1);
+  margin-bottom: var(--space-md);
+}
+
+/* Círculo desenhado à mão em volta da palavra "Design" */
+.hero__circle {
+  position: relative;
+  display: inline-block;
+  padding: 0 .3em;
+}
+.hero__circle::after {
+  content: '';
+  position: absolute;
+  inset: -0.15em -0.35em;
+  border: 2px solid var(--color-clay);
+  border-radius: 50% 45% 55% 50% / 55% 50% 55% 45%;
+  transform: rotate(-3deg);
+  pointer-events: none;
+}
+
+@media (max-width: 780px) {
+  .hero__slide { grid-template-columns: 1fr; text-align: center; }
+  .hero__featured { grid-template-columns: 1fr; justify-items: center; }
+  .hero__text h1 { font-size: 2.4rem; }
+  .hero__book-icon { margin: var(--space-sm) auto 0; }
+}
