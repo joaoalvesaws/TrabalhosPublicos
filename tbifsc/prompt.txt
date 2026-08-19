@@ -1,0 +1,9 @@
+prompt:
+https://www.figma.com/proto/k0XCgfg7WzvSbuBKq8Mu4L/Sem-t%C3%ADtulo?node-id=1-4439&m=draw&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&t=CNITec0EZQ5tG1mR-1
+Nestes 2 arquivos, tenho um protótipo de uma landing page de livraria, quero o arquivo dos componentes para rodar
+Não precisa fazer backend
+utilize html, css, javascript
+paleta de cores: off-white, cores terrosas
+me de os componentes em arquivos divididos, para que eu analise e implemente os mesmos
+cada componente seja acompanhado com um readme de como implementar o componente e onde colocar o mesmo
+lembre-se de adaptar cada componente e o site para o modelo de site

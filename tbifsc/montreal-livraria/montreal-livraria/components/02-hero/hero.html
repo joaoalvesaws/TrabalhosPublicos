@@ -1,0 +1,41 @@
+<!-- =========================================================
+     COMPONENTE: Hero / Banner de boas-vindas
+     Ver README.md nesta pasta para instruções de instalação.
+     ========================================================= -->
+<section class="hero section--alt" id="top" aria-label="Boas-vindas">
+  <div class="container hero__inner">
+
+    <button class="hero__arrow hero__arrow--prev" id="heroPrev" aria-label="Slide anterior">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="hero__slides" id="heroSlides">
+
+      <!-- Slide 1 -->
+      <article class="hero__slide" data-slide="0">
+        <div class="hero__text">
+          <h1>Seja<br>Bem-vindo</h1>
+          <svg class="hero__book-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2 5.5C2 5.5 5 4 9 4s7 1.5 7 1.5v14S13 18 9 18s-7 1.5-7 1.5V5.5Z"/>
+            <path d="M22 5.5C22 5.5 19 4 15 4s-3 .3-3 .3v15.2s2-1.5 3-1.5 5 1.5 7 1.5V5.5Z" opacity=".55"/>
+          </svg>
+        </div>
+
+        <div class="hero__featured">
+          <div class="hero__book dog-ear">
+            <span class="hero__book-title">O LIVRO<br>DO DESIGN</span>
+          </div>
+          <div class="hero__caption">
+            <h2>O livro do <span class="hero__circle">Design</span></h2>
+            <a href="#" class="btn btn--outline">Consultar</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <button class="hero__arrow hero__arrow--next" id="heroNext" aria-label="Próximo slide">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</section>
