@@ -1,0 +1,32 @@
+João Gabriel Alves dos Santos
+26/08/2026
+Front-end de Projetos Web
+
+
+
+Criar um documento que explique sobre os temas abaixo:
+-Frontend X Backend (Diferenças)
+-IHC interação homem máquina
+-Usabilidade na internet
+-Acessibilidade
+-Experiência do Usuário (UX)
+
+
+
+-------
+Diferenças de Frontend e Backend:
+frontend é a parte visual da aplicação, onde os textos são exibidos na tela, cores, menus, botões, imagens; utiliza HTML, CSS, JavaScript em sua composição; tem foco na experiência do usuário (UX), acessibilidade e design responsivo
+Backend é a parte por trás dos panos, os bastidores; processa as informações que o usuário envia, salva no banco de dados e aplicas as regras de negócio; utiliza java, php, python, node.js, SQL; tem foco na segurança, desempenho do servidor, tratamento de dados e na escalabilidade.
+
+--------
+IHC interação homem máquina
+è a área que vai estudar como as pessoas operam e se comunicam com sistemas, estudando o design, psicologia e ergonomia, analisando a interface, garantindo a usabilidade (sistema simples e intuitivo), acessibilidade,etc.
+-------------
+usabilidade na internet
+É a facilidade com que as pessoas conseguem navegar, interagir e realizar tarefas em sites e aplicativos com o menor esforço possível, garantindo uma eficiência, intuitividade e satisfação do usuário
+-------------
+acessibilidade
+Vai garantir que diversas pessoas (tanto com deficiência visual, motora, auditiva ou cognitiva) consigam navegar e interagir com páginas da web
+-------------
+experiência do usuário (UX)
+é o conjunto de percepções, sentimentos e reações de uma pessoa ao interagir com um produto, sistema ou serviço, tornando a jornada do usuário mais fácil, eficiente, intuitiva e agradável, estudando como o usuário pensa, sente e resolve problemas
